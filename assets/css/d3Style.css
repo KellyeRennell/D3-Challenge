@@ -13,7 +13,7 @@
 
 .inactive {
   font-weight: lighter;
-  fill: #c9c9c9;
+  fill: #faf5f5;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
 }
@@ -25,13 +25,14 @@
 
 /* font size dependent on radius, see app.js */
 .stateText {
+  font-weight: bold;
   font-family: sans-serif;
   fill: #fff;
   text-anchor: middle;
 }
 
 .stateCircle {
-  fill: #89bdd3;
+  fill: #5cbce6;
   stroke: #e3e3e3;
 }
 

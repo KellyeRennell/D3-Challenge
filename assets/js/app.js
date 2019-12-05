@@ -1,128 +1,131 @@
-//referencing day 3 activities 7 and 10 
-  // SVG wrapper dimensions are determined by the current width and
-     const  
-         svgWidth = 960;
-         svgHeight = 500;
+// SVG wrapper dimensions are determined by the current width and
+// (async function() {
+(async function() { 
+    const
+    svgWidth = 960;
+    svgHeight = 500;
+ 
+//Create an object to represent the chart's margins within the SVG container
+const margin = {
+    top: 20,
+    right: 40,
+    bottom: 80,
+    left: 100
+};
+
+//setting up the params for the SVG, chart area minus the margins
+
+const width = svgWidth - margin.left - margin.right;
+const height = svgHeight - margin.top - margin.bottom;
+
+// Create an SVG wrapper/container, appending an SVG group that will hold our chart.
+const svg = d3.select("#scatter")
+    .append("svg")
+    .attr("height", svgHeight)
+    .attr("width", svgWidth);
     
- //Create an object to represent the chart's margins within the SVG container
-    const margin = {
-        top: 20,
-        right: 40,
-        bottom: 80,
-        left: 100
-    };
-
-    //setting up the params for the SVG, chart area minus the margins
-   
-    var width = svgWidth - margin.left - margin.right;
-    var height = svgHeight - margin.top - margin.bottom;
-
- // Create an SVG wrapper/container, appending an SVG group that will hold our chart.
-
-    const svg = d3
-        .select("#scatter")
-        .append("svg")
-        .attr("height", svgHeight)
-        .attr("width", svgWidth);
-
-//append group element("g") that will hold our chart
-    var chartGroup = svg.append("g")
-         .attr("transform", `translate(${margin.left}, ${margin.top})`);
+const chartGroup = svg.append("g")
+    .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 //Retrieve data from the CSV file and execute everything below
-(async function() {
-    const stateData = await d3.csv("./assets/data/data.csv")
-    .catch(error => console.warn(error))
-    console.log(stateData);
 
-    stateData.forEach(function(d) {
-        d.poverty = +d.poverty;
-        d.healthcare = +d.healthcare;
-    
-});
-  
+const stateData = await d3.csv("../assets/data/data.csv");
+// console.log(stateData);
+
+     // console.log(stateData);
+    stateData.forEach(function(data) {
+            data.poverty = +data.poverty;
+            data.healthcare = +data.healthcare;
+              
+    });
    
-    let xScale = d3.scaleLinear()
-        .domain([5, d3.max(stateData, d => d.poverty)])
+   
+ //Create scales  
+    var xScale = d3.scaleLinear()
+        .domain([8, d3.max(stateData, d => d.poverty)])
         .range([0, width]);
-       
-    let yScale = d3.scaleLinear()
-        .domain([2, d3.max(stateData, d => d.healthcare)])
+
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(stateData, d => d.healthcare)])
         .range([height, 0]);
-      
-   let xAxis = d3.axisBottom(xScale);
-   let yAxis = d3.axisLeft(yScale);
 
-   chartGroup.append("g")
-   .attr("transform", `translate(0, ${height})`)
-   .call(xAxis);
+//Create axes functions
+    var xAxis = d3.axisBottom(xScale);
+    var yAxis = d3.axisLeft(yScale);
 
-   chartGroup.append("g")
-       .call(yAxis);
+//Append axes to chartgroup
+    chartGroup.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .classed("x-axis", true)
+        .call(xAxis);
 
-// Step 5: Create Circles
-// ==============================
+    //Add yAxis to left side of display
+    chartGroup.append("g")
+    .classed("y-axis", true)
+        .call(yAxis);
+
+    // Step 5: Create Circle groups for the content of each circle
+    // ==============================
+    
+    var toolTip = d3.tip()
+    .attr("class", "tooltip")
+    .attr([80, -60])
+    .html(function(d) {
+        return (`<strong>${d.state}<br>In Poverty (%): ${d.poverty}<br> Lacks Healthcare (%): ${d.healthcare}`);
+    });
+
+//create tooltip in chartgroup
+    chartGroup.call(toolTip);
+
     var circlesGroup = chartGroup.selectAll("circle")
         .data(stateData)
         .enter()
         .append("circle")
-        .attr("cx", d => xScale(d.poverty))
-        .attr("cy", d => yScale(d.healthcare))
-        .attr("r", "15")
-        .attr("class", function(d) {
-            return "state" + d.abbr;
-        })
-        .attr("fill", "steelblue")
+        .classed("stateCircle", true)
+        .attr ("cx", d => xScale(d.poverty)-1)
+        .attr ("cy", d => yScale(d.healthcare)+1)
+        .attr("r", 20)
+        .attr("fill", "blue")
         .attr("opacity", ".5")
 
-       
 
-    var toolTip = d3.tip()
-        .attr("class", "d3-tip")
-        .html(function(d) {
-            return (abbr + "%");
-        });
+    circlesGroup.on("mouseover", function(d) {
+        toolTip.show(d, this);
+      })
+        // onmouseout event
+        .on("mouseout", function(d, index) {
+          toolTip.hide(d);
+      });
 
-chartGroup.call(toolTip);
+      chartGroup.selectAll(".stateText")
+      .data(stateData)
+      .enter()
+      .append("text")
+      .classed("stateText", true)
+      .text(d => d.abbr)
+      .attr("x", d => xScale(d.poverty))
+      .attr("y", d => yScale(d.healthcare)+5)
+      .attr("font-size", "10px")
+      .attr("fill", "black")
+      .style("text-anchor", "middle");
+        
 
-//// Step 8: Create event listeners to display and hide the tooltip
-circlesGroup.on("click", function(d) {
-    toolTip.show(data);
-})
-
-.on("mouseout", function(data, index) {
-        toolTip.hide(data);
-    });
-
-    //// Create axes labels
-
-chartGroup.append("text")
-    .selectAll("p")
-    .data(stateData)
-    .enter()
-    .append("text")
-    .attr("x", function(data) {
-        return xScale(data.healthcare);
-        })
-        .attr("y", function(data) {
-            return yScale(data.poverty);
-        })
-        .text(function(data) {
-            return data.abbr
-        });
-
-chartGroup.append("text")
+    // Add the text label for the axes
+   
+    chartGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left + 40)
         .attr("x", 0 - (height / 2))
         .attr("dy", "1em")
-        .attr("class", "axisText")
+        .classed("class", "axisText")
         .text("Lacks Healthcare (%)");
 
-chartGroup.append("text")
-        .attr("transform", `translate(${width /2}, ${height + margin.top + 30})`)
+    chartGroup.append("text")
+        .attr("transform", `translate(${width / 2}, ${height + margin.top + 20})`)
         .attr("class", "axisText")
         .text("In Poverty (%)");
-
     
-})()
+    })()
+
+
+
