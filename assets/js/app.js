@@ -14,7 +14,6 @@ const margin = {
 };
 
 //setting up the params for the SVG, chart area minus the margins
-
 const width = svgWidth - margin.left - margin.right;
 const height = svgHeight - margin.top - margin.bottom;
 
@@ -85,6 +84,9 @@ const stateData = await d3.csv("../assets/data/data.csv");
         .attr ("cx", d => xScale(d.poverty)-1)
         .attr ("cy", d => yScale(d.healthcare)+1)
         .attr("r", 20)
+        .attr("class", function(d) {
+            return "stateCircle " + d.abbr;
+          })
         .attr("fill", "blue")
         .attr("opacity", ".5")
 
@@ -103,8 +105,8 @@ const stateData = await d3.csv("../assets/data/data.csv");
       .append("text")
       .classed("stateText", true)
       .text(d => d.abbr)
-      .attr("x", d => xScale(d.poverty))
-      .attr("y", d => yScale(d.healthcare)+5)
+      .attr("x", d => xScale(d.poverty)-0)
+      .attr("y", d => yScale(d.healthcare)-0.2)
       .attr("font-size", "10px")
       .attr("fill", "black")
       .style("text-anchor", "middle");

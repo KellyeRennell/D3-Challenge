@@ -13,7 +13,7 @@
 
 .inactive {
   font-weight: lighter;
-  fill: #faf5f5;
+  fill: #cbebfaf5;
   transition: fill 0.3s ease-out;
   text-anchor: middle;
 }
@@ -32,7 +32,7 @@
 }
 
 .stateCircle {
-  fill: #5cbce6;
+  fill: #89bdd3;
   stroke: #e3e3e3;
 }
 
@@ -42,6 +42,8 @@
 }
 
 .d3-tip {
+  position: absolute;
+  pointer-events: none!important;
   padding: 6px;
   font-size: 12px;
   line-height: 1;
