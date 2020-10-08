@@ -1,5 +1,5 @@
 
-# D3 Homework - Data Journalism and D3
+# Data Journalism with D3 JavaScript Library
 
 Site published at: https://kellyerennell.github.io/Data_Visualization_with-D3/.
 
